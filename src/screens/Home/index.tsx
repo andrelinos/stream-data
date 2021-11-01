@@ -168,7 +168,7 @@ export function Home() {
     function handleLoadData() {
         getTopGames();
         getUserFollowedStreams();
-        getFriends();
+        // getFriends();
     }
 
     useEffect(() => {

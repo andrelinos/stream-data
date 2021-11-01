@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+
 import { useTheme } from 'styled-components';
 import { Fontisto } from '@expo/vector-icons';
 import { ActivityIndicator, Alert, Modal, View } from 'react-native';
 
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth, User } from '../../hooks/useAuth';
 
 import LoginBannerImg from '../../assets/images/login.svg';
 import LogoImg from '../../assets/images/logo.svg';
@@ -35,7 +36,6 @@ export function SignIn() {
             );
         }
     }
-
     return (
         <Container
             from={{

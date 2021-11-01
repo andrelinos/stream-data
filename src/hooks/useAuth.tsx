@@ -6,11 +6,12 @@ import React, {
     useState,
     ReactNode
 } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { generateRandom } from 'expo-auth-session/build/PKCE';
 
 import { api } from '../services/api';
 
-interface User {
+export interface User {
     id: number;
     display_name: string;
     email: string;
@@ -43,10 +44,17 @@ function AuthProvider({ children }: AuthProviderData) {
     const [userToken, setUserToken] = useState('');
 
     const { CLIENT_ID } = process.env;
+    const dataKey = '@STREAM-DATA:twitch:user_access';
 
     async function signIn() {
         try {
             setIsLoggingIn(true);
+
+            const response = await AsyncStorage.getItem(dataKey);
+            if(response) {
+            const currentUserData = response && JSON.parse(response);
+            setUser(currentUserData);
+            } else {
 
             const REDIRECT_URI = makeRedirectUri({ useProxy: true });
             const RESPONSE_TYPE = 'token';
@@ -79,18 +87,19 @@ function AuthProvider({ children }: AuthProviderData) {
 
                 // console.log(userResponse)
 
-                const { id, display_name, email, profile_image_url } =
-                    userResponse.data.data[0];
+                const user = userResponse.data.data[0];
 
                 setUser({
-                    id,
-                    display_name,
-                    email,
-                    profile_image_url
+                    id: user.id,
+                    display_name: user.display_name,
+                    email: user.email,
+                    profile_image_url: user.profile_image_url
                 });
 
                 setUserToken(authResponse.params.access_token);
-            }
+
+                await AsyncStorage.setItem(dataKey, JSON.stringify(user));
+            }}
         } catch (error) {
             throw new Error();
         } finally {
