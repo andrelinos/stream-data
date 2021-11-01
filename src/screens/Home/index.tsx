@@ -1,202 +1,370 @@
 import { useTheme } from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, Modal, ActivityIndicator, View } from 'react-native';
-import { Feather } from '@expo/vector-icons'
+import { Feather } from '@expo/vector-icons';
 
 import { TopGamesCard } from '../../components/TopGamesCard';
 import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../services/api';
 
 import {
-  Container, 
-  Header, 
-  UserInfo, 
-  Avatar, 
-  UserInfoText,
-  SignOutButton, 
-  UserFollowedStreams, 
-  UserFollowedStreamsTitle, 
-  TopGames, 
-  TopGamesTitle
+    Container,
+    Header,
+    UserInfo,
+    Avatar,
+    UserInfoText,
+    RefreshButton,
+    SignOutButton,
+    UserFollowedStreams,
+    UserFollowedStreamsTitle,
+    TopGames,
+    UserInfoContainer,
+    TopGamesTitle,
+    UserInfoId,
+    Friends,
+    FriendsTitle,
+    FriendsCard
 } from './styles';
 import { UserFollowedStreamCard } from '../../components/UserFollowedStreamCard';
+import theme from '../../styles/theme';
 
 interface TopGames {
-  box_art_url: string, 
-  id: string, 
-  name: string
+    box_art_url: string;
+    id: string;
+    name: string;
+}
+
+interface Friends {
+
 }
 
 interface UserFollowedStreams {
-  id: string;
-  thumbnail_url: string, 
-  title: string,
-  user_id: string, 
-  user_login: string, 
-  user_name: string,
-  viewer_count: number
+    id: string;
+    thumbnail_url: string;
+    title: string;
+    user_id: string;
+    user_login: string;
+    user_name: string;
+    user_email: string;
+    viewer_count: number;
 }
 
 interface UserFollowedStreamsFormatted extends UserFollowedStreams {
-  user_avatar_url: string;
+    user_avatar_url: string;
 }
 
 export function Home() {
-  const [topGames, setTopGames] = useState<TopGames[]>([]);
-  const [userFollowedStreams, setUserFollowedStreams] = useState<UserFollowedStreamsFormatted[]>([]);
-  const [isLoadingUserFollowedStreams, setIsLoadingUserFollowedStreams] = useState(true);
-  const [isLoadingTopGames, setIsLoadingTopGames] = useState(true);
-  
-  const theme = useTheme();
-  const { signOut, user, isLoggingOut } = useAuth();
+    const [friends, setFriends] = useState<TopGames[]>([]);
+    const [topGames, setTopGames] = useState<TopGames[]>([]);
+    const [userFollowedStreams, setUserFollowedStreams] = useState<
+        UserFollowedStreamsFormatted[]
+    >([]);
+    const [isLoadingUserFollowedStreams, setIsLoadingUserFollowedStreams] =
+        useState(true);
+    const [isLoadingTopGames, setIsLoadingTopGames] = useState(true);
+    const [isLoadingFriends, setIsLoadingFriends] = useState(true);
 
-  // creates a function to handle sign out
-    // try to call and wait signOut
-    // if fails, display an Alert with the title "Erro SignOut" and message "Ocorreu um erro ao tentar se deslogar do app"
 
-  async function getTopGames() {
-    try {
-      const response = await api.get('/games/top');
+    const theme = useTheme();
+    const { signOut, user, isLoggingOut } = useAuth();
 
-      setTopGames(response.data.data);
-      setIsLoadingTopGames(false);
-    } catch (error) {
-      Alert.alert('Erro Top Games', 'Ocorreu um erro ao buscar os jogos mais assistidos agora na Twitch');
-    }
-  }
-
-  async function getUserFollowedStreamsAvatar(userFollowedStreamsData: UserFollowedStreams[]) {
-    return Promise.all(userFollowedStreamsData.map(async (item) => {
+    async function handleSignOut() {
         try {
-          const response = await api.get(`/users?id=${item.user_id}`);
-
-          return { ...item, user_avatar_url: response.data.data[0].profile_image_url }
+            await signOut();
         } catch (error) {
-          return { ...item, user_avatar_url: 'https://static-cdn.jtvnw.net/user-default-pictures-uv/cdd517fe-def4-11e9-948e-784f43822e80-profile_image-300x300.png' }
+            Alert.alert('Erro SignOut', 'Ocorreu um erro ao sair');
         }
-      })
-    )
-  }
-
-  async function getUserFollowedStreams() {
-    try {
-      const response = await api.get<{ data: UserFollowedStreams[] }>(`/streams/followed?user_id=${user.id}`);
-
-      const formattedResponse = await getUserFollowedStreamsAvatar(response.data.data);
-      
-      if (formattedResponse) {
-        setUserFollowedStreams(formattedResponse);
-        setIsLoadingUserFollowedStreams(false);
-      }
-    } catch (error) {
-      Alert.alert('Erro User Followed Streams', 'Ocorreu um erro ao buscar as informações das streams ao vivo que o usuário segue');
     }
-  }
 
-  useEffect(() => {
-    getTopGames();
-    getUserFollowedStreams();
-  }, [])
+    async function getFriends() {
+      const response = await api.get('/friends');
+        try {
 
-  return (
-    <Container
-      from={{
-        opacity: 0,
-        scale: 0.9,
-      }}
-      animate={{
-        opacity: 1,
-        scale: 1,
-      }}
-      exit={{
-        opacity: 0,
-        scale: 0.9,
-      }}
-    >
-      <Header>
-        <UserInfo>
-          <Avatar source={{ uri: user.profile_image_url }} />
+            setFriends(response.data.data);
+            setIsLoadingFriends(false);
 
-          <UserInfoText>Olá, </UserInfoText>
-          <UserInfoText style={{ fontFamily: theme.fonts.bold }}>{user.display_name}</UserInfoText>
-        </UserInfo>
+            console.log(response)
+        } catch (error) {
+            Alert.alert(
+                'Erro Friends',
+                'Ocorreu um erro ao buscar amigos na Twitch'
+            );
+        }
+    }
 
-        {/* <SignOutButton onPress={}>
-          Verify if isLoggingOut is true
-          If it is, show an ActivityIndicator
-          Otherwise, show Feather's power icon
-        </SignOutButton> */}
-      </Header>
+    async function getTopGames() {
+        try {
+            const response = await api.get('/games/top');
 
-      <UserFollowedStreams>
-        <UserFollowedStreamsTitle>Canais que você segue</UserFollowedStreamsTitle>
+            setTopGames(response.data.data);
+            setIsLoadingTopGames(false);
+        } catch (error) {
+            Alert.alert(
+                'Erro Top Games',
+                'Ocorreu um erro ao buscar os jogos mais assistidos agora na Twitch'
+            );
+        }
+    }
 
-        <FlatList 
-          data={!isLoadingUserFollowedStreams ? userFollowedStreams : [{ id: '1' } as UserFollowedStreamsFormatted, { id: '2' } as UserFollowedStreamsFormatted]}
-          keyExtractor={item => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          maxToRenderPerBatch={4}
-          initialNumToRender={4}
-          getItemLayout={(_, index) => (
-            { length: 276, offset: 276 * index, index }
-          )}
-          contentContainerStyle={{
-            paddingLeft: 24,
-            paddingRight: 12
-          }}
-          renderItem={({ item }) => (
-            <UserFollowedStreamCard 
-              avatarUrl={item.user_avatar_url}
-              streamer_login={item.user_login}
-              streamer_name={item.user_name}
-              thumbnailUrl={item.thumbnail_url}
-              title={item.title}
-              viewersCount={item.viewer_count}
-              isLoadingUserFollowedStreams={isLoadingUserFollowedStreams}
-            />
-          )}
-        />
-      </UserFollowedStreams>
+    async function getRecommended() {
+        try {
+            const response = await api.get('/games/recommended');
 
-      <TopGames>
-        <TopGamesTitle>Mais assistidos do momento</TopGamesTitle>
+            setTopGames(response.data.data);
+            setIsLoadingTopGames(false);
+        } catch (error) {
+            Alert.alert(
+                'Erro Recomendados',
+                'Ocorreu um erro ao buscar os jogos recomendados na Twitch'
+            );
+        }
+    }
 
-        <FlatList 
-          data={!isLoadingTopGames ? topGames : [{ id: '1' } as TopGames, { id: '2' } as TopGames, { id: '3' } as TopGames]}
-          keyExtractor={item => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          maxToRenderPerBatch={5}
-          initialNumToRender={5}
-          getItemLayout={(_, index) => (
-            { length: 166, offset: 166 * index, index }
-          )}
-          contentContainerStyle={{
-            paddingLeft: 24,
-            paddingRight: 8
-          }}
-          renderItem={({ item }) => (
-            <TopGamesCard
-              key={item.id}
-              url={item.box_art_url}
-              name={item.name}
-              isLoadingTopGames={isLoadingTopGames}
-            />
-          )}
-        />
-      </TopGames>
+    async function getUserFollowedStreamsAvatar(
+        userFollowedStreamsData: UserFollowedStreams[]
+    ) {
+        return Promise.all(
+            userFollowedStreamsData.map(async (item) => {
+                try {
+                    const response = await api.get(`/users?id=${item.user_id}`);
 
-      <Modal 
-        animationType="fade"
-        visible={isLoggingOut}
-        statusBarTranslucent
-        transparent
-      >
-        <View
-          style={{ flex: 1, backgroundColor: 'rgba(14, 14, 16, 0.5)' }}
-        />
-      </Modal>
-    </Container>
-  );
+                    return {
+                        ...item,
+                        user_avatar_url: response.data.data[0].profile_image_url
+                    };
+                } catch (error) {
+                    return {
+                        ...item,
+                        user_avatar_url:
+                            'https://static-cdn.jtvnw.net/user-default-pictures-uv/cdd517fe-def4-11e9-948e-784f43822e80-profile_image-300x300.png'
+                    };
+                }
+            })
+        );
+    }
+
+    async function getUserFollowedStreams() {
+        try {
+            const response = await api.get<{ data: UserFollowedStreams[] }>(
+                `/streams/followed?user_id=${user.id}`
+            );
+
+            const formattedResponse = await getUserFollowedStreamsAvatar(
+                response.data.data
+            );
+
+            if (formattedResponse) {
+                setUserFollowedStreams(formattedResponse);
+                setIsLoadingUserFollowedStreams(false);
+            }
+        } catch (error) {
+            Alert.alert(
+                'Erro User Followed Streams',
+                'Ocorreu um erro ao buscar as informações das streams ao vivo que o usuário segue'
+            );
+        }
+    }
+
+    function handleLoadData() {
+        getTopGames();
+        getUserFollowedStreams();
+        getFriends();
+    }
+
+    useEffect(() => {
+        handleLoadData();
+    }, []);
+
+    return (
+        <Container
+            from={{
+                opacity: 0,
+                scale: 0.9
+            }}
+            animate={{
+                opacity: 1,
+                scale: 1
+            }}
+            exit={{
+                opacity: 0,
+                scale: 0.9
+            }}
+        >
+            <Header>
+                <UserInfo>
+                    <Avatar source={{ uri: user.profile_image_url }} />
+
+                    <UserInfoContainer>
+                        <View style={{ flexDirection: 'row' }}>
+                            <UserInfoText>Olá, </UserInfoText>
+                            <UserInfoText
+                                style={{ fontFamily: theme.fonts.bold }}
+                            >
+                                {user.display_name}
+                            </UserInfoText>
+                        </View>
+                        <UserInfoId>ID: {user.id}</UserInfoId>
+                    </UserInfoContainer>
+                </UserInfo>
+
+                <View style={{ flexDirection: 'row' }}>
+                    <RefreshButton onPress={handleLoadData}>
+                        <Feather
+                            name="refresh-cw"
+                            size={24}
+                            color={theme.colors.white}
+                        />
+                    </RefreshButton>
+                    <SignOutButton onPress={handleSignOut}>
+                        {isLoggingOut ? (
+                            <ActivityIndicator
+                                size={25}
+                                color={theme.colors.white}
+                            />
+                        ) : (
+                            <Feather
+                                name="power"
+                                size={24}
+                                color={theme.colors.white}
+                            />
+                        )}
+                    </SignOutButton>
+                </View>
+            </Header>
+
+            <UserFollowedStreams>
+                <UserFollowedStreamsTitle>
+                    Canais que você segue
+                </UserFollowedStreamsTitle>
+
+                <FlatList
+                    data={
+                        !isLoadingUserFollowedStreams
+                            ? userFollowedStreams
+                            : [
+                                  { id: '1' } as UserFollowedStreamsFormatted,
+                                  { id: '2' } as UserFollowedStreamsFormatted
+                              ]
+                    }
+                    keyExtractor={(item) => item.id}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    maxToRenderPerBatch={4}
+                    initialNumToRender={4}
+                    getItemLayout={(_, index) => ({
+                        length: 276,
+                        offset: 276 * index,
+                        index
+                    })}
+                    contentContainerStyle={{
+                        paddingLeft: 24,
+                        paddingRight: 12
+                    }}
+                    renderItem={({ item }) => (
+                        <UserFollowedStreamCard
+                            avatarUrl={item.user_avatar_url}
+                            streamer_login={item.user_login}
+                            streamer_name={item.user_name}
+                            thumbnailUrl={item.thumbnail_url}
+                            title={item.title}
+                            viewersCount={item.viewer_count}
+                            isLoadingUserFollowedStreams={
+                                isLoadingUserFollowedStreams
+                            }
+                        />
+                    )}
+                />
+            </UserFollowedStreams>
+
+            <TopGames>
+                <TopGamesTitle>Mais assistidos do momento</TopGamesTitle>
+
+                <FlatList
+                    data={
+                        !isLoadingTopGames
+                            ? topGames
+                            : [
+                                  { id: '1' } as TopGames,
+                                  { id: '2' } as TopGames,
+                                  { id: '3' } as TopGames
+                              ]
+                    }
+                    keyExtractor={(item) => item.id}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    maxToRenderPerBatch={5}
+                    initialNumToRender={5}
+                    getItemLayout={(_, index) => ({
+                        length: 166,
+                        offset: 166 * index,
+                        index
+                    })}
+                    contentContainerStyle={{
+                        paddingLeft: 24,
+                        paddingRight: 8
+                    }}
+                    renderItem={({ item }) => (
+                        <TopGamesCard
+                            key={item.id}
+                            url={item.box_art_url}
+                            name={item.name}
+                            isLoadingTopGames={isLoadingTopGames}
+                        />
+                    )}
+                />
+            </TopGames>
+{/* 
+            <Friends>
+                <FriendsTitle>Mais assistidos do momento</FriendsTitle>
+
+                <FlatList
+                    data={
+                        !isLoadingFriends
+                            ? Friends
+                            : [
+                                  { id: '1' } as Friends,
+                                  { id: '2' } as Friends,
+                                  { id: '3' } as Friends
+                              ]
+                    }
+                    keyExtractor={(item) => item.id}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    maxToRenderPerBatch={5}
+                    initialNumToRender={5}
+                    getItemLayout={(_, index) => ({
+                        length: 166,
+                        offset: 166 * index,
+                        index
+                    })}
+                    contentContainerStyle={{
+                        paddingLeft: 24,
+                        paddingRight: 8
+                    }}
+                    renderItem={({ item }) => (
+                        <FriendsCard
+                            key={item.id}
+                            url={item.box_art_url}
+                            name={item.name}
+                            isLoadingFriends={isLoadingFriends}
+                        />
+                    )}
+                />
+            </Friends> */}
+
+            <Modal
+                animationType="fade"
+                visible={isLoggingOut}
+                statusBarTranslucent
+                transparent
+            >
+                <View
+                    style={{
+                        flex: 1,
+                        backgroundColor: 'rgba(14, 14, 16, 0.5)'
+                    }}
+                />
+            </Modal>
+        </Container>
+    );
 }
