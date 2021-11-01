@@ -27,6 +27,8 @@ import {
 } from './styles';
 import { UserFollowedStreamCard } from '../../components/UserFollowedStreamCard';
 import theme from '../../styles/theme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isLoading } from 'expo-font';
 
 interface TopGames {
     box_art_url: string;
@@ -34,9 +36,7 @@ interface TopGames {
     name: string;
 }
 
-interface Friends {
-
-}
+interface Friends {}
 
 interface UserFollowedStreams {
     id: string;
@@ -54,15 +54,14 @@ interface UserFollowedStreamsFormatted extends UserFollowedStreams {
 }
 
 export function Home() {
-    const [friends, setFriends] = useState<TopGames[]>([]);
     const [topGames, setTopGames] = useState<TopGames[]>([]);
+    const [isLoading, setIsLoading] = useState(false);      
     const [userFollowedStreams, setUserFollowedStreams] = useState<
         UserFollowedStreamsFormatted[]
     >([]);
     const [isLoadingUserFollowedStreams, setIsLoadingUserFollowedStreams] =
         useState(true);
     const [isLoadingTopGames, setIsLoadingTopGames] = useState(true);
-    const [isLoadingFriends, setIsLoadingFriends] = useState(true);
 
 
     const theme = useTheme();
@@ -76,22 +75,6 @@ export function Home() {
         }
     }
 
-    async function getFriends() {
-      const response = await api.get('/friends');
-        try {
-
-            setFriends(response.data.data);
-            setIsLoadingFriends(false);
-
-            console.log(response)
-        } catch (error) {
-            Alert.alert(
-                'Erro Friends',
-                'Ocorreu um erro ao buscar amigos na Twitch'
-            );
-        }
-    }
-
     async function getTopGames() {
         try {
             const response = await api.get('/games/top');
@@ -102,20 +85,6 @@ export function Home() {
             Alert.alert(
                 'Erro Top Games',
                 'Ocorreu um erro ao buscar os jogos mais assistidos agora na Twitch'
-            );
-        }
-    }
-
-    async function getRecommended() {
-        try {
-            const response = await api.get('/games/recommended');
-
-            setTopGames(response.data.data);
-            setIsLoadingTopGames(false);
-        } catch (error) {
-            Alert.alert(
-                'Erro Recomendados',
-                'Ocorreu um erro ao buscar os jogos recomendados na Twitch'
             );
         }
     }
@@ -158,6 +127,8 @@ export function Home() {
                 setIsLoadingUserFollowedStreams(false);
             }
         } catch (error) {
+            console.log(error);
+            AsyncStorage.clear();
             Alert.alert(
                 'Erro User Followed Streams',
                 'Ocorreu um erro ao buscar as informações das streams ao vivo que o usuário segue'
@@ -166,9 +137,11 @@ export function Home() {
     }
 
     function handleLoadData() {
+        setIsLoading(true);
         getTopGames();
         getUserFollowedStreams();
-        // getFriends();
+    //    AsyncStorage.clear();
+        setIsLoading(false);
     }
 
     useEffect(() => {
@@ -209,11 +182,18 @@ export function Home() {
 
                 <View style={{ flexDirection: 'row' }}>
                     <RefreshButton onPress={handleLoadData}>
-                        <Feather
-                            name="refresh-cw"
-                            size={24}
-                            color={theme.colors.white}
-                        />
+                        {isLoading ? (
+                            <ActivityIndicator
+                                size={25}
+                                color={theme.colors.white}
+                            />
+                        ) : (
+                            <Feather
+                                name="refresh-cw"
+                                size={24}
+                                color={theme.colors.white}
+                            />
+                        )}
                     </RefreshButton>
                     <SignOutButton onPress={handleSignOut}>
                         {isLoggingOut ? (
@@ -233,9 +213,11 @@ export function Home() {
             </Header>
 
             <UserFollowedStreams>
-                <UserFollowedStreamsTitle>
-                    Canais que você segue
-                </UserFollowedStreamsTitle>
+                {userFollowedStreams && (
+                    <UserFollowedStreamsTitle>
+                        Canais que você segue
+                    </UserFollowedStreamsTitle>
+                )}
 
                 <FlatList
                     data={
@@ -313,44 +295,6 @@ export function Home() {
                     )}
                 />
             </TopGames>
-{/* 
-            <Friends>
-                <FriendsTitle>Mais assistidos do momento</FriendsTitle>
-
-                <FlatList
-                    data={
-                        !isLoadingFriends
-                            ? Friends
-                            : [
-                                  { id: '1' } as Friends,
-                                  { id: '2' } as Friends,
-                                  { id: '3' } as Friends
-                              ]
-                    }
-                    keyExtractor={(item) => item.id}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    maxToRenderPerBatch={5}
-                    initialNumToRender={5}
-                    getItemLayout={(_, index) => ({
-                        length: 166,
-                        offset: 166 * index,
-                        index
-                    })}
-                    contentContainerStyle={{
-                        paddingLeft: 24,
-                        paddingRight: 8
-                    }}
-                    renderItem={({ item }) => (
-                        <FriendsCard
-                            key={item.id}
-                            url={item.box_art_url}
-                            name={item.name}
-                            isLoadingFriends={isLoadingFriends}
-                        />
-                    )}
-                />
-            </Friends> */}
 
             <Modal
                 animationType="fade"

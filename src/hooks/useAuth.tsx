@@ -44,64 +44,86 @@ function AuthProvider({ children }: AuthProviderData) {
     const [userToken, setUserToken] = useState('');
 
     const { CLIENT_ID } = process.env;
-    const dataKey = '@STREAM-DATA:twitch:user_access';
+    const userDataKey = '@STREAM-DATA:twitch:user_access';
+    const userTokenKey = '@STREAM-DATA:twitch:user_access_token';
 
     async function signIn() {
         try {
             setIsLoggingIn(true);
+            // AsyncStorage.clear()
 
-            const response = await AsyncStorage.getItem(dataKey);
-            if(response) {
-            const currentUserData = response && JSON.parse(response);
-            setUser(currentUserData);
-            } else {
+            const userResponse = await AsyncStorage.getItem(userDataKey);
+            const tokenResponse = await AsyncStorage.getItem(userTokenKey);
+            if (userResponse) {
+                if (tokenResponse) {
+                    const currentUserData =
+                        userResponse && JSON.parse(userResponse);
 
-            const REDIRECT_URI = makeRedirectUri({ useProxy: true });
-            const RESPONSE_TYPE = 'token';
-            const SCOPE = encodeURI('openid user:read:email user:read:follows');
-            const FORCE_VERIFY = true;
-            const STATE = generateRandom(30);
+                    setUser(currentUserData);
+                    api.defaults.headers.authorization = tokenResponse;
 
-            const authUrl =
-                twitchEndpoints.authorization +
-                `?client_id=${CLIENT_ID}` +
-                `&redirect_uri=${REDIRECT_URI}` +
-                `&response_type=${RESPONSE_TYPE}` +
-                `&scope=${SCOPE}` +
-                `&force_verify=${FORCE_VERIFY}` +
-                `&state=${STATE}`;
-
-            const authResponse = await startAsync({ authUrl });
-
-            if (
-                authResponse.type === 'success' &&
-                authResponse.params.error !== 'access_denied'
-            ) {
-                if (authResponse.params.state !== STATE) {
-                    throw new Error('Invalid response');
+                    console.log('USER: ', userResponse);
+                    console.log('TOKEN:', tokenResponse);
                 }
+            } else {
+                const REDIRECT_URI = makeRedirectUri({ useProxy: true });
+                const RESPONSE_TYPE = 'token';
+                const SCOPE = encodeURI(
+                    'openid user:read:email user:read:follows channel:edit:commercial user:read:broadcast user:read:blocked_users user:read:broadcast'
+                );
+                const FORCE_VERIFY = true;
+                const STATE = generateRandom(30);
 
-                api.defaults.headers.authorization = `Bearer ${authResponse.params.access_token}`;
+                const authUrl =
+                    twitchEndpoints.authorization +
+                    `?client_id=${CLIENT_ID}` +
+                    `&redirect_uri=${REDIRECT_URI}` +
+                    `&response_type=${RESPONSE_TYPE}` +
+                    `&scope=${SCOPE}` +
+                    `&force_verify=${FORCE_VERIFY}` +
+                    `&state=${STATE}`;
 
-                const userResponse = await api.get('/users');
+                const authResponse = await startAsync({ authUrl });
 
-                // console.log(userResponse)
+                if (
+                    authResponse.type === 'success' &&
+                    authResponse.params.error !== 'access_denied'
+                ) {
+                    if (authResponse.params.state !== STATE) {
+                        throw new Error('Invalid response');
+                    }
 
-                const user = userResponse.data.data[0];
+                    api.defaults.headers.authorization = `Bearer ${authResponse.params.access_token}`;
 
-                setUser({
-                    id: user.id,
-                    display_name: user.display_name,
-                    email: user.email,
-                    profile_image_url: user.profile_image_url
-                });
+                    const userResponse = await api.get('/users');
 
-                setUserToken(authResponse.params.access_token);
+                    // console.log(userResponse)
 
-                await AsyncStorage.setItem(dataKey, JSON.stringify(user));
-            }}
+                    const user = userResponse.data.data[0];
+
+                    setUser({
+                        id: user.id,
+                        display_name: user.display_name,
+                        email: user.email,
+                        profile_image_url: user.profile_image_url
+                    });
+
+                    setUserToken(authResponse.params.access_token);
+
+                    await AsyncStorage.setItem(
+                        userDataKey,
+                        JSON.stringify(user)
+                    );
+                    await AsyncStorage.setItem(
+                        userTokenKey,
+                        JSON.stringify(
+                            `Bearer ${authResponse.params.access_token}`
+                        )
+                    );
+                }
+            }
         } catch (error) {
-            throw new Error();
+            throw new Error('Invalid');
         } finally {
             setIsLoggingIn(false);
         }
