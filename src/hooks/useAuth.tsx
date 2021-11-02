@@ -60,7 +60,9 @@ function AuthProvider({ children }: AuthProviderData) {
                         userResponse && JSON.parse(userResponse);
 
                     setUser(currentUserData);
-                    api.defaults.headers.authorization = tokenResponse;
+                    setUserToken(tokenResponse);
+                    api.defaults.headers.authorization = `Bearer ${tokenResponse}`;
+                    api.defaults.headers['Client-Id'] = CLIENT_ID;
 
                     console.log('USER: ', userResponse);
                     console.log('TOKEN:', tokenResponse);
@@ -69,7 +71,7 @@ function AuthProvider({ children }: AuthProviderData) {
                 const REDIRECT_URI = makeRedirectUri({ useProxy: true });
                 const RESPONSE_TYPE = 'token';
                 const SCOPE = encodeURI(
-                    'openid user:read:email user:read:follows channel:edit:commercial user:read:broadcast user:read:blocked_users user:read:broadcast'
+                    'openid user:read:email user:read:follows'
                 );
                 const FORCE_VERIFY = true;
                 const STATE = generateRandom(30);
@@ -85,6 +87,7 @@ function AuthProvider({ children }: AuthProviderData) {
 
                 const authResponse = await startAsync({ authUrl });
 
+
                 if (
                     authResponse.type === 'success' &&
                     authResponse.params.error !== 'access_denied'
@@ -97,9 +100,10 @@ function AuthProvider({ children }: AuthProviderData) {
 
                     const userResponse = await api.get('/users');
 
-                    // console.log(userResponse)
 
                     const user = userResponse.data.data[0];
+
+                    console.log('USER API: ', user);
 
                     setUser({
                         id: user.id,
@@ -116,9 +120,7 @@ function AuthProvider({ children }: AuthProviderData) {
                     );
                     await AsyncStorage.setItem(
                         userTokenKey,
-                        JSON.stringify(
-                            `Bearer ${authResponse.params.access_token}`
-                        )
+                        JSON.stringify(authResponse.params.access_token)
                     );
                 }
             }
