@@ -54,7 +54,7 @@ function AuthProvider({ children }: AuthProviderData) {
 
             const REDIRECT_URI = makeRedirectUri({ useProxy: true });
             const RESPONSE_TYPE = 'token';
-            const SCOPE = encodeURI('openid user:read:email user:read:follows');
+            const SCOPE = encodeURI('openid user:read:email user:read:follows channel:edit:commercial');
             const FORCE_VERIFY = true;
             const STATE = generateRandom(30);
 
@@ -82,8 +82,6 @@ function AuthProvider({ children }: AuthProviderData) {
                 const userResponse = await api.get('/users');
 
                 const user = userResponse.data.data[0];
-
-                console.log('USER API: ', user);
 
                 setUser({
                     id: user.id,
@@ -154,7 +152,13 @@ function AuthProvider({ children }: AuthProviderData) {
 
     return (
         <AuthContext.Provider
-            value={{ user, isLoggingOut, isLoggingIn, signIn, signOut }}
+            value={{
+                user,
+                isLoggingOut,
+                isLoggingIn,
+                signIn,
+                signOut
+            }}
         >
             {children}
         </AuthContext.Provider>
