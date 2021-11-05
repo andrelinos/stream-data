@@ -36,8 +36,17 @@
 
 <br/><br>
 
-# 🏇 Tecnologias usadas
+## 🎨 Funcionalidades
 ---
+- Login social com a Twitch. 
+- Atualizar a tela sem necessidade de reload na aplicação.
+- Lista todos os canais ao vivo que vc segue.
+- Lista os canais mais assistidos da Twitch.
+- Logout para limpar informações de login da aplicação.
+
+<br/><br>
+
+# 🏇 Tecnologias usadas
 - [React Native](https://reactnative.dev/)
 - [Expo](https://expo.dev/)
 - [Axios ](https://axios-http.com/)
@@ -115,7 +124,10 @@ Se você tive alguma dúvida, poderá entrar em contato comigo aqui [andrelino.d
 
 ## 📄 Licença MIT
 ---
-Consulte a [LICENÇA](LICENSE) para mais informações.
+
+
+- Consulte a [LICENÇA](LICENSE) para mais informações.
+<br/><br>
 
 ---
 <p align="center"> Made with 💜 by [Andrelino Silva](https://github.com/andrelinos/)</p>
