@@ -6,9 +6,10 @@
 <br>
 
 <p align="center">
-  <a href="#-telas">Telas</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#-tecnologias">Tecnologias</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#-clonando">Clonando</a>&nbsp;&nbsp;&nbsp;
+  <a href="#-Telas da aplicação">Telas</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#-Tecnologias usadas">Tecnologias</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#-Funcionalidades">Funcionalidades</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#-Como executar o projeto em seu celular usando o expo">Clonando</a>&nbsp;&nbsp;&nbsp;
   |&nbsp;&nbsp;&nbsp;
   <a href="#-Executando">Executando</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#-Licença">Licença</a>
