@@ -259,135 +259,146 @@ export function Home() {
             </Header>
 
             <ScrollView>
-                <UserFollowedStreams>
-                    {userFollowedStreams.length > 0 && (
-                        <UserFollowedStreamsTitle>
-                            Canais que você segue
-                        </UserFollowedStreamsTitle>
-                    )}
-
-                    <FlatList
-                        data={
-                            !isLoadingUserFollowedStreams
-                                ? userFollowedStreams
-                                : [
-                                      {
-                                          id: '1'
-                                      } as UserFollowedStreamsFormatted,
-                                      {
-                                          id: '2'
-                                      } as UserFollowedStreamsFormatted
-                                  ]
-                        }
-                        keyExtractor={(item) => item.id}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        maxToRenderPerBatch={4}
-                        initialNumToRender={4}
-                        getItemLayout={(_, index) => ({
-                            length: 276,
-                            offset: 276 * index,
-                            index
-                        })}
-                        contentContainerStyle={{
-                            paddingLeft: 24,
-                            paddingRight: 12
-                        }}
-                        renderItem={({ item }) => (
-                            <UserFollowedStreamCard
-                                avatarUrl={item.user_avatar_url}
-                                streamer_login={item.user_login}
-                                streamer_name={item.user_name}
-                                thumbnailUrl={item.thumbnail_url}
-                                title={item.title}
-                                viewersCount={item.viewer_count}
-                                isLoadingUserFollowedStreams={
-                                    isLoadingUserFollowedStreams
-                                }
-                            />
+                <>
+                    <UserFollowedStreams>
+                        {userFollowedStreams.length > 0 && (
+                            <UserFollowedStreamsTitle>
+                                Canais que você segue{' '}
+                                {userFollowedStreams.length > 0 &&
+                                    `(${userFollowedStreams.length})`}
+                            </UserFollowedStreamsTitle>
                         )}
-                    />
-                </UserFollowedStreams>
 
-                <TopGames>
-                    <TopGamesTitle>Mais assistidos do momento</TopGamesTitle>
+                        <FlatList
+                            data={
+                                !isLoadingUserFollowedStreams
+                                    ? userFollowedStreams
+                                    : [
+                                          {
+                                              id: '1'
+                                          } as UserFollowedStreamsFormatted,
+                                          {
+                                              id: '2'
+                                          } as UserFollowedStreamsFormatted
+                                      ]
+                            }
+                            keyExtractor={(item) => item.id}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            maxToRenderPerBatch={4}
+                            initialNumToRender={4}
+                            getItemLayout={(_, index) => ({
+                                length: 276,
+                                offset: 276 * index,
+                                index
+                            })}
+                            contentContainerStyle={{
+                                paddingLeft: 24,
+                                paddingRight: 12
+                            }}
+                            renderItem={({ item }) => (
+                                <UserFollowedStreamCard
+                                    avatarUrl={item.user_avatar_url}
+                                    streamer_login={item.user_login}
+                                    streamer_name={item.user_name}
+                                    thumbnailUrl={item.thumbnail_url}
+                                    title={item.title}
+                                    viewersCount={item.viewer_count}
+                                    isLoadingUserFollowedStreams={
+                                        isLoadingUserFollowedStreams
+                                    }
+                                />
+                            )}
+                        />
+                    </UserFollowedStreams>
 
-                    <FlatList
-                        data={
-                            !isLoadingTopGames
-                                ? topGames
-                                : [
-                                      { id: '1' } as TopGames,
-                                      { id: '2' } as TopGames,
-                                      { id: '3' } as TopGames
-                                  ]
-                        }
-                        keyExtractor={(item) => item.id}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        maxToRenderPerBatch={5}
-                        initialNumToRender={5}
-                        getItemLayout={(_, index) => ({
-                            length: 166,
-                            offset: 166 * index,
-                            index
-                        })}
-                        contentContainerStyle={{
-                            paddingLeft: 24,
-                            paddingRight: 8
-                        }}
-                        renderItem={({ item }) => (
-                            <TopGamesCard
-                                key={item.id}
-                                url={item.box_art_url}
-                                name={item.name}
-                                isLoadingTopGames={isLoadingTopGames}
-                            />
-                        )}
-                    />
-                </TopGames>
-
-                <TopGames>
-                    {usersFollows.length > 0 && (
+                    <TopGames>
                         <TopGamesTitle>
-                            Seus seguidores ({usersFollows.length})
+                            Mais assistidos do momento{' '}
+                            {topGames.length > 0 && `(${topGames.length})`}
                         </TopGamesTitle>
-                    )}
 
-                    <FlatList
-                        data={
-                            !isLoadingUsersFollows
-                                ? usersFollows
-                                : [
-                                      { id: '1' } as UsersFollowsFormatted,
-                                      { id: '2' } as UsersFollowsFormatted,
-                                      { id: '3' } as UsersFollowsFormatted
-                                  ]
-                        }
-                        keyExtractor={(item) => item.id}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        maxToRenderPerBatch={5}
-                        initialNumToRender={5}
-                        getItemLayout={(_, index) => ({
-                            length: 166,
-                            offset: 166 * index,
-                            index
-                        })}
-                        contentContainerStyle={{
-                            paddingLeft: 24,
-                            paddingRight: 8
-                        }}
-                        renderItem={({ item }) => (
-                            <UsersFollowsCard
-                                key={item.id}
-                                url={item.thumbnail_url}
-                                name={item.user_name}
-                                isLoadingUsersFollows={isLoadingUsersFollows}
-                            />
+                        <FlatList
+                            data={
+                                !isLoadingTopGames
+                                    ? topGames
+                                    : [
+                                          { id: '1' } as TopGames,
+                                          { id: '2' } as TopGames,
+                                          { id: '3' } as TopGames
+                                      ]
+                            }
+                            keyExtractor={(item) => item.id}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            maxToRenderPerBatch={5}
+                            initialNumToRender={5}
+                            getItemLayout={(_, index) => ({
+                                length: 166,
+                                offset: 166 * index,
+                                index
+                            })}
+                            contentContainerStyle={{
+                                paddingLeft: 24,
+                                paddingRight: 8
+                            }}
+                            renderItem={({ item }) => (
+                                <TopGamesCard
+                                    key={item.id}
+                                    url={item.box_art_url}
+                                    name={item.name}
+                                    isLoadingTopGames={isLoadingTopGames}
+                                />
+                            )}
+                        />
+                    </TopGames>
+
+                    <TopGames>
+                        {usersFollows.length > 0 && (
+                            <TopGamesTitle>
+                                Seus seguidores
+                                {usersFollows.length > 0 &&
+                                    `(${usersFollows.length})`}
+                            </TopGamesTitle>
                         )}
-                    />
-                </TopGames>
+
+                        <FlatList
+                            data={
+                                !isLoadingUsersFollows
+                                    ? usersFollows
+                                    : [
+                                          { id: '1' } as UsersFollowsFormatted,
+                                          { id: '2' } as UsersFollowsFormatted,
+                                          { id: '3' } as UsersFollowsFormatted
+                                      ]
+                            }
+                            keyExtractor={(item) => item.id}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            maxToRenderPerBatch={5}
+                            initialNumToRender={5}
+                            getItemLayout={(_, index) => ({
+                                length: 166,
+                                offset: 166 * index,
+                                index
+                            })}
+                            contentContainerStyle={{
+                                paddingLeft: 24,
+                                paddingRight: 8
+                            }}
+                            renderItem={({ item }) => (
+                                <UsersFollowsCard
+                                    key={item.id}
+                                    url={item.thumbnail_url}
+                                    name={item.user_name}
+                                    isLoadingUsersFollows={
+                                        isLoadingUsersFollows
+                                    }
+                                />
+                            )}
+                        />
+                    </TopGames>
+                </>
             </ScrollView>
 
             <Modal
