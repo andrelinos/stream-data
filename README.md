@@ -12,7 +12,7 @@
   <a href="#-clonando-o-projeto-para-sua-máquina">Clonando</a>&nbsp;&nbsp;&nbsp;
   |&nbsp;&nbsp;&nbsp;
   <a href="#-como-executar-o-projeto-em-seu-celular-usando-o-expo">Executando</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#-caso-tenha-dúvidas">Dúvidas</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#-dúvidas">Dúvidas</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#-licença-mit">Licença</a>
 </p>
 
@@ -111,7 +111,7 @@ $ expo start
 
 <br/><br>
 
-## ✔️ Caso tenha dúvidas
+## ✔️ Dúvidas
 ---
 Se você tive alguma dúvida, poderá entrar em contato comigo aqui [andrelino.dev](https://andrelino.dev).
 
