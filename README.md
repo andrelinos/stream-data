@@ -23,6 +23,7 @@
 <br/><br/>
 
 # 🔄 Telas da aplicação
+---
 <br/>
 
 ## Página login
@@ -38,7 +39,7 @@
 
 <br/><br>
 
-## 🎨 Funcionalidades
+# 🎨 Funcionalidades
 ---
 - Login social com a Twitch. 
 - Atualizar a tela sem necessidade de reload na aplicação.
@@ -49,6 +50,7 @@
 <br/><br>
 
 # 🏇 Tecnologias usadas
+---
 - [React Native](https://reactnative.dev/)
 - [Expo](https://expo.dev/)
 - [Axios ](https://axios-http.com/)
@@ -132,4 +134,4 @@ Se você tive alguma dúvida, poderá entrar em contato comigo aqui [andrelino.d
 <br/><br>
 
 ---
-<p align="center"> Made with 💜 by [Andrelino Silva](https://github.com/andrelinos/)</p>
+<p align="center"> Made with 💜 by <a href="https://github.com/andrelinos"> Andrelino Silva </a></p>
